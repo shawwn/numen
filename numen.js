@@ -369,7 +369,7 @@ function represent (value, from, depth, batch) {
     }
     if (typeof value === 'symbol') {
         var s = Symbol.keyFor(value);
-        return { 'sym' : s || '<symbol>' }
+        return { 'sym' : s || value.toString() }
     }
     if (typeof value !== 'object') {
         throw new Error('Unrecognized type ' + typeof value);
