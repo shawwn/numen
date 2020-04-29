@@ -11,6 +11,31 @@ def send(x, numen_input, numen_output):
   res = json.loads(line[line.find('{'):])
   return res
 
+def value_string(v):
+  if v.get('error?'):
+    r = "{}\n\n".format(v['vals'][0]['str'])
+    for val in v['vals'][1:]:
+      r += "  {}\n".format(value_string(val))
+    return r
+  if 'null' in v:
+    return v['null']
+  if 'str' in v:
+    return repr(v['str'])
+  if 'num' in v:
+    return str(v['num'])
+  if 'fn' in v:
+    return '{}:{}:{} {}'.format(
+        v.get('script', 'unknown'),
+        v.get('line', 0),
+        v.get('column', 0),
+        v['fn'])
+  if 'keys' in v:
+    n = max([len(x) for x in v['keys']]) + 1
+    return '\n'.join(
+        ["{} {}".format(k.ljust(n), value_string(v))
+          for k, v in zip(v['keys'], v['vals'])])
+  return "Unknown value"
+
 if __name__ == "__main__":
   if not os.path.exists("stdin") or not os.path.exists("stdout"):
     sys.stderr.write("Server not running\n");
@@ -23,4 +48,7 @@ if __name__ == "__main__":
     sys.stdout.flush()
     line = sys.stdin.readline()
     line = line.rstrip()
-    pp(send(line, numen_input, numen_output))
+    res = send(line, numen_input, numen_output)
+    pp(res)
+    if 'evaluation' in res:
+      print(value_string(res['evaluation']['value']))
