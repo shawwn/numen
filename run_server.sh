@@ -6,6 +6,7 @@ shift 1
 
 if [ -z $port ]
 then
+  rm -f stdin stdout
   mkfifo stdin
   mkfifo stdout
   # nvm use 0.12
