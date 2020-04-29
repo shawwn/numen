@@ -745,7 +745,7 @@ launchNumen = function (lang, port, logpath, loadpath) {
         numenLogPrefix = ensureEnd(logpath, '/') + "numen-";
     }
     process.on('uncaughtException', sendException);
-    if (!port) {
+    if (port == null) {
         listen(process.stdin, process.stdout);
     } else if (!S) {
         var pidfile = "/tmp/numenpid" + port;
@@ -761,7 +761,7 @@ launchNumen = function (lang, port, logpath, loadpath) {
         S = net.createServer(function (c) { listen(c, c, port); });
         S.listen(port, function () {
             fs.writeFileSync(pidfile, process.pid);
-            log('Numen ' + process.pid + ' is listening on port ' + port);
+            log('Numen ' + process.pid + ' is listening on port ' + S.address().port);
             if (loadpath) {
                 log('loading ' + loadpath + '...');
                 numenLoad(loadpath, null, null, 88); // arbitrary exit code for load failure
