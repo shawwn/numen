@@ -11,16 +11,18 @@ def send(x, numen_input, numen_output):
   res = json.loads(line[line.find('{'):])
   return res
 
-def value_string(v):
+def numen_stringify(v):
   if v.get('error?'):
     r = "{}\n\n".format(v['vals'][0]['str'])
     for val in v['vals'][1:]:
-      r += "  {}\n".format(value_string(val))
+      r += "  {}\n".format(numen_stringify(val))
     return r
   if 'null' in v:
     return v['null']
   if 'str' in v:
     return repr(v['str'])
+  if 'sym' in v:
+    return v['sym']
   if 'num' in v:
     return str(v['num'])
   if 'fn' in v:
@@ -32,8 +34,17 @@ def value_string(v):
   if 'keys' in v:
     n = max([len(x) for x in v['keys']]) + 1
     return '\n'.join(
-        ["{} {}".format(k.ljust(n), value_string(v))
+        ["{} {}".format(k.ljust(n), numen_stringify(v))
           for k, v in zip(v['keys'], v['vals'])])
+  if 'vals' in v:
+    r = "["
+    c = ""
+    for v in v['vals']:
+      s = numen_stringify(v)
+      r += c + s
+      c = ", "
+    r += "]"
+    return r
   return "Unknown value"
 
 if __name__ == "__main__":
@@ -51,4 +62,4 @@ if __name__ == "__main__":
     res = send(line, numen_input, numen_output)
     pp(res)
     if 'evaluation' in res:
-      print(value_string(res['evaluation']['value']))
+      print(numen_stringify(res['evaluation']['value']))
