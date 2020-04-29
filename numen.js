@@ -657,6 +657,7 @@ function extractToplevelRequest (buffer) {
         } catch (e) {
             log("Failed to parse " + need + " chars from:");
             log(buffer);
+            log(e.message)
         }
         buffer.str = str.substr(need+1); // strip terminating newline
         delete buffer.need;
